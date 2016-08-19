@@ -22,32 +22,35 @@ main =
 
 
 type alias Model =
-  { dieFace : Int
+  { firstDieFace : Int
+  , secondDieFace : Int
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  (Model 1, Random.generate NewFace (Random.int 1 6))
+  (Model 1 1, Random.generate NewFaces (randomPair 1 6))
 
-
+randomPair : Int -> Int -> Random.Generator (Int, Int)
+randomPair min max =
+    Random.pair (Random.int min max) (Random.int min max)
 
 -- UPDATE
 
 
 type Msg
   = Roll
-  | NewFace Int
+  | NewFaces (Int, Int)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Roll ->
-      (model, Random.generate NewFace (Random.int 1 6))
+      (model, Random.generate NewFaces (randomPair 1 6))
 
-    NewFace newFace ->
-      (Model newFace, Cmd.none)
+    NewFaces (firstNewFace, secondNewFace) ->
+      (Model firstNewFace secondNewFace, Cmd.none)
 
 
 
@@ -66,7 +69,9 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   div []
-    [ drawDice model.dieFace
+    [ drawDice model.firstDieFace
+    , text " "
+    , drawDice model.secondDieFace
     , br [] []
     , button [ onClick Roll ] [ text "Roll" ]
     ]
