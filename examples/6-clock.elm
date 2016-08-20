@@ -68,32 +68,20 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  let
-    angleMin =
-      turns (Time.inMinutes model.time) - Basics.pi/2
-
-    minHandX =
-      toString (50 + 40 * cos angleMin)
-
-    minHandY =
-      toString (50 + 40 * sin angleMin)
-
-    angleHours =
-      turns (Time.inHours model.time) - Basics.pi/2
-
-    hoursHandX =
-      toString (50 + 30 * cos angleHours)
-
-    hoursHandY =
-      toString (50 + 30 * sin angleHours)
-  in
-      Html.div [] [
-           svg [ viewBox "0 0 100 100", width "300px" ]
-               [ circle [ cx "50", cy "50", r "45", fill "#0B79CE" ] []
-               , line [ x1 "50", y1 "50", x2 minHandX, y2 minHandY, stroke "#023963" ] []
-               , line [ x1 "50", y1 "50", x2 hoursHandX, y2 hoursHandY, stroke "white" ] []
-               ]
-          , pauseButton model ]
+    let calculateHand f time length =
+            let angle = turns (f time) - Basics.pi/2
+                x = (50 + length * cos angle)
+                y = (50 + length * sin angle)
+            in { x= toString x, y= toString y}
+        minuteHand = calculateHand Time.inMinutes model.time 40
+        hourHand = calculateHand Time.inHours model.time 30
+    in Html.div [] [
+         svg [ viewBox "0 0 100 100", width "300px" ]
+             [ circle [ cx "50", cy "50", r "45", fill "#0B79CE" ] []
+             , line [ x1 "50", y1 "50", x2 minuteHand.x, y2 minuteHand.y, stroke "#023963" ] []
+             , line [ x1 "50", y1 "50", x2 hourHand.x, y2 hourHand.y, stroke "white" ] []
+             ]
+        , pauseButton model ]
 
 pauseButton : Model -> Html Msg
 pauseButton {active} =
