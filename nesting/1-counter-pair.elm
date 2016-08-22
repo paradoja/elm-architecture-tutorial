@@ -38,21 +38,24 @@ type Msg
   = Reset
   | Top Counter.Msg
   | Bottom Counter.Msg
+  | Swap
 
 
 update : Msg -> Model -> Model
 update message model =
-  case message of
-    Reset ->
-      init 0 0
+    case message of
+        Reset ->
+            init 0 0
 
-    Top msg ->
-      { model | topCounter = Counter.update msg model.topCounter }
+        Top msg ->
+            { model | topCounter = Counter.update msg model.topCounter }
 
-    Bottom msg ->
-      { model | bottomCounter = Counter.update msg model.bottomCounter }
+        Bottom msg ->
+            { model | bottomCounter = Counter.update msg model.bottomCounter }
 
-
+        Swap ->
+            { topCounter = model.bottomCounter
+            , bottomCounter = model.topCounter}
 
 -- VIEW
 
@@ -64,4 +67,5 @@ view model =
     [ App.map Top (Counter.view model.topCounter)
     , App.map Bottom (Counter.view model.bottomCounter)
     , button [ onClick Reset ] [ text "RESET" ]
+    , button [ onClick Swap ] [ text "SWAP" ]
     ]
